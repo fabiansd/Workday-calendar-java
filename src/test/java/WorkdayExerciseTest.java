@@ -16,7 +16,7 @@ public class WorkdayExerciseTest {
     private Date incrementDate1 = new Date(2004, Calendar.MAY, 24, 18, 5);
     private float increment1 = -5.5f;
 
-    private float incrementPos = 3.5f;
+    private float incrementPos = 8.27f;
 
     @Test
     public void testDateReturnNegative(){
