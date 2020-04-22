@@ -4,8 +4,6 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class WorkdayExerciseTest {
 
     private WorkdayExercise workdayExercise = new WorkdayExercise();
@@ -13,20 +11,58 @@ public class WorkdayExerciseTest {
     private GregorianCalendar startDate =  new GregorianCalendar(2004, Calendar.JANUARY, 1, 8, 0);
     private GregorianCalendar endDate =  new GregorianCalendar(2004, Calendar.JANUARY, 1, 16, 0);
 
-    private Date incrementDate1 = new Date(2004, Calendar.MAY, 24, 18, 5);
-    private float increment1 = -5.5f;
-
-    private float incrementPos = 8.27f;
-
     @Test
-    public void testDateReturnNegative(){
+    public void testDate1(){
+        Date incrementDate = new Date(2004, Calendar.MAY, 24, 18, 5);
+        float inc = -5.5f;
+
         workdayExercise.setWorkdayStartAndStop(startDate, endDate);
-        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate1, increment1);
+        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate, inc);
+
+        System.out.println("Time " + resultDate);
     }
 
     @Test
-    public void testDateReturnPosInc(){
+    public void testDate2(){
+        Date incrementDate = new Date(2004, Calendar.MAY, 24, 19, 3);
+        float inc = 44.723656f;
+
         workdayExercise.setWorkdayStartAndStop(startDate, endDate);
-        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate1, incrementPos);
+        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate, inc);
+
+        System.out.println("Time " + resultDate);
+    }
+
+    @Test
+    public void testDate3(){
+        Date incrementDate = new Date(2004, Calendar.MAY, 24, 18, 3);
+        float inc = -6.7470217f;
+
+        workdayExercise.setWorkdayStartAndStop(startDate, endDate);
+        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate, inc);
+
+        System.out.println("Time " + resultDate);
+    }
+
+    @Test
+    public void testDate4(){
+        Date incrementDate = new Date(2004, Calendar.MAY, 24, 8, 3);
+        float inc = 12.782709f;
+
+        workdayExercise.setWorkdayStartAndStop(startDate, endDate);
+        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate, inc);
+
+        System.out.println("Time " + resultDate);
+    }
+
+    @Test
+    public void testDate5(){
+        Date incrementDate = new Date(2004, Calendar.MAY, 24, 7, 3);
+        float inc = 8.276628f;
+
+        workdayExercise.setWorkdayStartAndStop(startDate, endDate);
+        Date resultDate = workdayExercise.getWorkdayIncrement(incrementDate, inc);
+
+        System.out.println("Time " + resultDate);
     }
 }

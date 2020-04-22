@@ -2,14 +2,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+/* TODO */
+//Upgrade JAVA version
 public class WorkdayExercise {
 
     private GregorianCalendar startWorkday;
     private GregorianCalendar endWorkday;
-    private float workdayMinDuration;
+    private float workdayMsDuration;
 
     WorkdayExercise() {}
 
+    /* TODO */
+    // Icororate checks for stored holidays
+    // TIPS: Use time/date.com
     private Boolean isWorkDay(int dayOfWeek) {
 
         if (dayOfWeek == 1 || dayOfWeek == 7){
@@ -19,26 +24,45 @@ public class WorkdayExercise {
         }
     }
 
+    private Boolean clockTimeIsAfter(Calendar date1, Calendar date2){
+        if (date1.get(Calendar.HOUR_OF_DAY) > date2.get(Calendar.HOUR_OF_DAY)){
+            return true;
+        } else if (date1.get(Calendar.HOUR_OF_DAY) == date2.get(Calendar.HOUR_OF_DAY) && date1.get(Calendar.MINUTE) > date1.get(Calendar.MINUTE)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private float clockTimeMsDiff(Calendar date1, Calendar date2){
+        Calendar tempDate =  (Calendar)date1.clone();
+        tempDate.set(Calendar.HOUR_OF_DAY, date2.get(Calendar.HOUR_OF_DAY));
+        tempDate.set(Calendar.MINUTE, date2.get(Calendar.MINUTE));
+
+        return date1.getTimeInMillis() - tempDate.getTimeInMillis();
+    }
+
     public void setWorkdayStartAndStop(GregorianCalendar startWorkday, GregorianCalendar endWorkday){
         this.startWorkday = startWorkday;
         this.endWorkday = endWorkday;
-        this.workdayMinDuration = (int)((endWorkday.getTimeInMillis() - startWorkday.getTimeInMillis())/60000);
+        this.workdayMsDuration = endWorkday.getTimeInMillis() - startWorkday.getTimeInMillis();
     }
+
+    /* TODO */
+    // Function to handle / store holidays
 
     public Date getWorkdayIncrement(Date startDate, float incrementWorkdays){
 
         Calendar startDateCalendar = Calendar.getInstance();
         startDateCalendar.setTime(startDate);
+
         int dayOfWeek = startDateCalendar.get(Calendar.DAY_OF_WEEK);
-
         int workdayIterations = Math.abs((int)incrementWorkdays);
-        float incrementWorkMin = (incrementWorkdays % 1);
-
         int dateDaysChange = 0;
-
         int incOrDec;
+        float incrementWorkMs = (incrementWorkdays % 1) * workdayMsDuration;
 
-        if (incrementWorkdays >= 0){
+        if (incrementWorkdays > 0){
             incOrDec = 1;
         } else {
             incOrDec = -1;
@@ -64,21 +88,64 @@ public class WorkdayExercise {
                 break;
             }
         }
+        /* TODO */
+        // Compress logic
+        if (incOrDec == 1){
 
-        if (incOrDec > 0 ){
-            startDateCalendar.set(Calendar.HOUR, startWorkday.get(Calendar.HOUR));
-            startDateCalendar.set(Calendar.MINUTE, startWorkday.get(Calendar.MINUTE));
+            // Startdate clock is before the start of the workday
+            if (clockTimeIsAfter(startWorkday,startDateCalendar)){
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, startWorkday.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, startWorkday.get(Calendar.MINUTE));
+                startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+            // Startdate clock is after the end of workday
+            } else if (clockTimeIsAfter(startDateCalendar, endWorkday)){
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, startWorkday.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, startWorkday.get(Calendar.MINUTE));
+                startDateCalendar.add(Calendar.DATE, 1);
+                startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+            // Startday clock is in the workday
+            } else {
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, startDateCalendar.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, startDateCalendar.get(Calendar.MINUTE));
 
-        } else {
-            startDateCalendar.set(Calendar.HOUR, endWorkday.get(Calendar.HOUR));
-            startDateCalendar.set(Calendar.MINUTE, endWorkday.get(Calendar.MINUTE));
-        }
+                // The increment will NOT stretch to the next workday
+                if (incrementWorkMs <= clockTimeMsDiff(endWorkday, startDateCalendar)){
+                    startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+                // The increment will stretch to the next workday
+                } else {
+                    startDateCalendar.add(Calendar.DATE, 1);
+                    startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs - clockTimeMsDiff(endWorkday, startDateCalendar)));
+                }
+            }
 
-        int minutes = (int)(workdayMinDuration * incrementWorkMin);
+        } else
+            // Startdate clock is after the end of workday
+            if (clockTimeIsAfter(startDateCalendar, endWorkday)){
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, endWorkday.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, endWorkday.get(Calendar.MINUTE));
+                startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+            // Startdate clock is before the datrt of workday
+            } else if (clockTimeIsAfter(startWorkday, startDateCalendar)){
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, endWorkday.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, endWorkday.get(Calendar.MINUTE));
+                startDateCalendar.add(Calendar.DATE, -1);
+                startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+                // Startday clock is in the workday
+            } else {
+                startDateCalendar.set(Calendar.HOUR_OF_DAY, startDateCalendar.get(Calendar.HOUR_OF_DAY));
+                startDateCalendar.set(Calendar.MINUTE, startDateCalendar.get(Calendar.MINUTE));
 
-        startDateCalendar.add(Calendar.MINUTE, minutes);
+                // The increment will NOT stretch to the previous workday
+                if (incrementWorkMs <= clockTimeMsDiff(startWorkday, startDateCalendar)){
+                    startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs));
+                    // The increment will stretch to the previous workday
+                } else {
+                    startDateCalendar.add(Calendar.DATE, -1);
+                    startDateCalendar.add(Calendar.MILLISECOND, (int)(incrementWorkMs - clockTimeMsDiff(endWorkday, startDateCalendar)));
+                }
+            }
+
         startDateCalendar.add(Calendar.DATE, dateDaysChange);
-
         return startDateCalendar.getTime();
     }
 }
